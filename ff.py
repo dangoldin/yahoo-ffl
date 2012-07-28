@@ -9,7 +9,7 @@ class YahooFFLReader:
         self.base_url = 'http://football.fantasysports.yahoo.com/'
         self.pw = pw
         self.logged_in = False
-    
+
     def login(self):
         print 'Logging in'
         if not self.logged_in:
@@ -26,7 +26,7 @@ class YahooFFLReader:
         form["passwd"] = self.pw
         fp = ClientCookie.urlopen(form.click())
         fp.close()
-    
+
     def retrieve_leagues(self):
         print 'Retrieving leagues'
         cookieJar = ClientCookie.CookieJar()
@@ -100,7 +100,7 @@ class YahooFFLReader:
                         user_stats.append([name,week,projected,actual,owned,passingYds,passingTDs,passingInts,sacks,rushingYds,rushingTDs,receivingRecs,receivingYds,receivingTDs,returnYds,returnTDs,twoPts,lostFumbles])
                 time.sleep(13)
         self.user_stats = user_stats
-        
+
     def write_stats(self):
         fields = ['name','week','projected','actual','owned','passingYds','passingTDs','passingInts','sacks','rushingYds','rushingTDs','receivingRecs','receivingYds','receivingTDs','returnYds','returnTDs','twoPts','lostFumbles']
         f = open('/home/dan/Dropbox/dev/web/yahoo-ffl/data.csv', 'w')
@@ -108,7 +108,7 @@ class YahooFFLReader:
         for vals in self.user_stats:
             f.write(",".join([ str(vals[x]) for x in range(len(fields))]) + "\n")
         f.close()
-    
+
     def to_num(self,str):
         str = str.replace(',','')
         return float(str)
@@ -121,7 +121,7 @@ def main(name,pw):
     reader.retrieve_player_stats()
     #time.sleep(5)
     reader.write_stats()
-    
+
 if __name__ == "__main__":
     name = sys.argv[1]
     pw = sys.argv[2]
