@@ -3,6 +3,12 @@ from BeautifulSoup import BeautifulSoup
 import ClientCookie
 import ClientForm
 
+import logging
+FORMAT = '%(levelname)s %(asctime)-15s %(message)s'
+logging.basicConfig(format=FORMAT)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 class YahooFFLReader:
     def __init__(self,name,pw):
         self.name = name
@@ -11,7 +17,7 @@ class YahooFFLReader:
         self.logged_in = False
 
     def login(self):
-        print 'Logging in'
+        logger.info('Logging in')
         if not self.logged_in:
             return
         cookieJar = ClientCookie.CookieJar()
@@ -28,7 +34,7 @@ class YahooFFLReader:
         fp.close()
 
     def retrieve_leagues(self):
-        print 'Retrieving leagues'
+        logger.info('Retrieving leagues')
         cookieJar = ClientCookie.CookieJar()
         opener = ClientCookie.build_opener(ClientCookie.HTTPCookieProcessor(cookieJar))
         opener.addheaders = [("User-agent","Mozilla/5.0 (compatible)")]
@@ -45,19 +51,22 @@ class YahooFFLReader:
         lines = fp.readlines()
         fp.close()
         text = "\n".join(lines)
-        f = open('/home/dan/Dropbox/dev/web/yahoo-ffl/tmp2.html', 'w')
+        f = open('temp.html', 'w')
         f.write(text)
         f.close()
         soup = BeautifulSoup(text)
         team_info = soup.find('div', {'class':'teams'})
         teams = {}
         for info in team_info.findAll('a', {'class':'team'}):
-            teams[info.string] = {'url':info['href']}
-        print teams
+            teams[info.string] = {
+                'url' : info['href'],
+                'league' : info['href'].split('/')[2]
+                }
+        logger.info('Teams: ' + str(teams))
         self.teams = teams
 
-    def retrieve_player_stats(self):
-        print 'Retrieving player stats'
+    def retrieve_player_stats(self, league_id, num_pages):
+        logger.info('Retrieving player stats')
         cookieJar = ClientCookie.CookieJar()
         opener = ClientCookie.build_opener(ClientCookie.HTTPCookieProcessor(cookieJar))
         opener.addheaders = [("User-agent","Mozilla/5.0 (compatible)")]
@@ -70,43 +79,50 @@ class YahooFFLReader:
         form["passwd"] = self.pw
         fp = ClientCookie.urlopen(form.click())
         fp.close()
-        num_pages = 10
-        user_stats = []
-        for page in range(num_pages):
-            count = str(25 * page)
-            for week in range(1,17):
-                print 'Getting page',page,'for week',week
+        week_stats = []
+        for week in range(1,17):
+            stats = []
+            for page in range(num_pages):
+                count = str(25 * page)
+                logger.info('Getting page %d for week %d' % (page,week))
                 stat = 'S_PW_' + str(week)
-                fp = ClientCookie.urlopen(self.base_url+'f1/96651/players?status=ALL&pos=O&stat1='+stat+'&count='+count)
+                url = self.base_url+'f1/%s/players?status=ALL&pos=O&stat1=%s&count=%s' % (league_id, stat, count)
+                logger.debug('Retrieving url at %s' % url)
+                fp = ClientCookie.urlopen(url)
                 lines = fp.readlines()
                 fp.close()
-                print "Cleaning up text"
+                logger.info('Cleaning up text')
                 text = "".join(lines)
                 text = text.replace("\n","")
                 text = text.replace("\r","")
                 text = re.sub(r'<\/html>.+','</html>',text,re.MULTILINE);
-                print "Converting to parse tree"
+                logger.info('Converting to parse tree')
                 soup = BeautifulSoup(text)
-                print "Extracting info"
+                logger.info('Extracting info')
                 re_odd = re.compile(R'odd')
                 re_even = re.compile(R'even')
+                categories = []
+                header_row = soup.find('tr', {'class': 'headerRow1'})
+                for th in header_row.findAll('th'):
+                    categories.append(th.text)
+                self.categories = categories
                 for info in soup.find('table', {'id':'statTable0'}).findAll('tr'):
                     c = info['class']
                     if re_odd.match(c) is not None or re_even.match(c) is not None:
-                        name = info.find(attrs={'class':'name'}).string
-                        (projected,actual,owned) = [x.string for x in info.findAll(attrs={'class':re.compile('stat wide')})]
-                        (passingYds,passingTDs,passingInts,sacks,rushingYds,rushingTDs,receivingRecs,receivingYds,receivingTDs,returnYds,returnTDs,twoPts,lostFumbles) = \
-                        [self.to_num(x.string) for x in info.findAll(attrs={'class':'stat'})]
-                        user_stats.append([name,week,projected,actual,owned,passingYds,passingTDs,passingInts,sacks,rushingYds,rushingTDs,receivingRecs,receivingYds,receivingTDs,returnYds,returnTDs,twoPts,lostFumbles])
-                time.sleep(13)
-        self.user_stats = user_stats
+                        vals = [td.text for td in info.findAll('td')]
+                        stats.append(vals)
+            week_stats.append(stats)
+            time.sleep(4)
+        self.week_stats = week_stats
 
     def write_stats(self):
-        fields = ['name','week','projected','actual','owned','passingYds','passingTDs','passingInts','sacks','rushingYds','rushingTDs','receivingRecs','receivingYds','receivingTDs','returnYds','returnTDs','twoPts','lostFumbles']
-        f = open('/home/dan/Dropbox/dev/web/yahoo-ffl/data.csv', 'w')
-        f.write(",".join(fields) + "\n")
-        for vals in self.user_stats:
-            f.write(",".join([ str(vals[x]) for x in range(len(fields))]) + "\n")
+        logger.info('Writing stats')
+        f = open('data.csv', 'w')
+        f.write('week,' + ",".join(self.categories) + "\n")
+        for i, week_stats in enumerate(self.week_stats):
+            for row in week_stats:
+                write_row = '%d,' % (i+1) + ",".join(row) + "\n"
+                f.write(write_row)
         f.close()
 
     def to_num(self,str):
@@ -114,12 +130,11 @@ class YahooFFLReader:
         return float(str)
 
 def main(name,pw):
+    num_pages = 10
     reader = YahooFFLReader(name,pw)
-    #time.sleep(5)
     #reader.retrieve_leagues()
     #time.sleep(5)
-    reader.retrieve_player_stats()
-    #time.sleep(5)
+    reader.retrieve_player_stats('192418',num_pages)
     reader.write_stats()
 
 if __name__ == "__main__":
