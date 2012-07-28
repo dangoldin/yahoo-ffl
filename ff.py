@@ -70,15 +70,14 @@ class YahooFFLReader:
         form["passwd"] = self.pw
         fp = ClientCookie.urlopen(form.click())
         fp.close()
-        num_pages = 1
+        num_pages = 10
         user_stats = []
         for page in range(num_pages):
             count = str(25 * page)
-            #for week in range(1,17):
-            for week in range(1,2):
+            for week in range(1,17):
                 print 'Getting page',page,'for week',week
                 stat = 'S_PW_' + str(week)
-                fp = ClientCookie.urlopen(self.base_url+'f1/315538/players?status=ALL&pos=O&stat1='+stat+'&count='+count)
+                fp = ClientCookie.urlopen(self.base_url+'f1/96651/players?status=ALL&pos=O&stat1='+stat+'&count='+count)
                 lines = fp.readlines()
                 fp.close()
                 print "Cleaning up text"
@@ -96,14 +95,14 @@ class YahooFFLReader:
                     if re_odd.match(c) is not None or re_even.match(c) is not None:
                         name = info.find(attrs={'class':'name'}).string
                         (projected,actual,owned) = [x.string for x in info.findAll(attrs={'class':re.compile('stat wide')})]
-                        (passingYds,passingTDs,passingInts,rushingYds,rushingTDs,receivingRecs,receivingYds,receivingTDs,returnTDs,twoPts,lostFumbles) = \
+                        (passingYds,passingTDs,passingInts,sacks,rushingYds,rushingTDs,receivingRecs,receivingYds,receivingTDs,returnYds,returnTDs,twoPts,lostFumbles) = \
                         [self.to_num(x.string) for x in info.findAll(attrs={'class':'stat'})]
-                        user_stats.append([name,week,projected,actual,owned,passingYds,passingTDs,passingInts,rushingYds,rushingTDs,receivingRecs,receivingYds,receivingTDs,returnTDs,twoPts,lostFumbles])
+                        user_stats.append([name,week,projected,actual,owned,passingYds,passingTDs,passingInts,sacks,rushingYds,rushingTDs,receivingRecs,receivingYds,receivingTDs,returnYds,returnTDs,twoPts,lostFumbles])
                 time.sleep(13)
         self.user_stats = user_stats
         
     def write_stats(self):
-        fields = ['name','week','projected','actual','owned','passingYds','passingTDs','passingInts','rushingYds','rushingTDs','receivingRecs','receivingYds','receivingTDs','returnTDs','twoPts','lostFumbles']
+        fields = ['name','week','projected','actual','owned','passingYds','passingTDs','passingInts','sacks','rushingYds','rushingTDs','receivingRecs','receivingYds','receivingTDs','returnYds','returnTDs','twoPts','lostFumbles']
         f = open('/home/dan/Dropbox/dev/web/yahoo-ffl/data.csv', 'w')
         f.write(",".join(fields) + "\n")
         for vals in self.user_stats:
