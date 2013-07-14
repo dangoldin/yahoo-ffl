@@ -32,34 +32,34 @@ class YahooFFLSpider(BaseSpider):
 
         self.log('Next url is at count {} with week {}'.format(count, current_week))
 
-        # Parse the stats
-        stat_rows = hxs.select('//table[@id="statTable0"]/tbody/tr')
-        xpath_map = {
-            'name': 'td[contains(@class,"player")]/div[contains(@class,"ysf-player-name")]/a/text()',
-            'position': 'td[contains(@class,"player")]/div[contains(@class,"ysf-player-detail")]/ul/li[contains(@class,"ysf-player-team-pos")]/span/text()',
-            'opp': 'td[contains(@class,"opp")]/text()',
-            'passing_yds': 'td[@class="stat"][1]/text()',
-            'passing_tds': 'td[@class="stat"][2]/text()',
-            'passing_int': 'td[@class="stat"][3]/text()',
-            'rushing_yds': 'td[@class="stat"][4]/text()',
-            'rushing_tds': 'td[@class="stat"][5]/text()',
-            'receiving_recs': 'td[@class="stat"][6]/text()',
-            'receiving_yds': 'td[@class="stat"][7]/text()',
-            'receiving_tds': 'td[@class="stat"][8]/text()',
-            'return_tds': 'td[@class="stat"][9]/text()',
-            'misc_twopt': 'td[@class="stat"][10]/text()',
-            'fumbles': 'td[@class="stat"][11]/text()',
-            'points': 'td[contains(@class,"pts")]/text()',
-        }
-        for stat_row in stat_rows:
-            stats_item = ScrapefflPlayerItem()
-            stats_item['week'] = current_week
-            for col_name, xpath in xpath_map.items():
-                stats_item[col_name] = stat_row.select(xpath).extract()
-            yield stats_item
-
-        # Jump to next week if we go past the threshold of players
         if current_week <= 17:
+            # Parse the stats
+            stat_rows = hxs.select('//table[@id="statTable0"]/tbody/tr')
+            xpath_map = {
+                'name': 'td[contains(@class,"player")]/div[contains(@class,"ysf-player-name")]/a/text()',
+                'position': 'td[contains(@class,"player")]/div[contains(@class,"ysf-player-detail")]/ul/li[contains(@class,"ysf-player-team-pos")]/span/text()',
+                'opp': 'td[contains(@class,"opp")]/text()',
+                'passing_yds': 'td[@class="stat"][1]/text()',
+                'passing_tds': 'td[@class="stat"][2]/text()',
+                'passing_int': 'td[@class="stat"][3]/text()',
+                'rushing_yds': 'td[@class="stat"][4]/text()',
+                'rushing_tds': 'td[@class="stat"][5]/text()',
+                'receiving_recs': 'td[@class="stat"][6]/text()',
+                'receiving_yds': 'td[@class="stat"][7]/text()',
+                'receiving_tds': 'td[@class="stat"][8]/text()',
+                'return_tds': 'td[@class="stat"][9]/text()',
+                'misc_twopt': 'td[@class="stat"][10]/text()',
+                'fumbles': 'td[@class="stat"][11]/text()',
+                'points': 'td[contains(@class,"pts")]/text()',
+            }
+            for stat_row in stat_rows:
+                stats_item = ScrapefflPlayerItem()
+                stats_item['week'] = current_week
+                for col_name, xpath in xpath_map.items():
+                    stats_item[col_name] = stat_row.select(xpath).extract()
+                yield stats_item
+
+        # Jump to next week if we go past the threshold of players        
             if count > self.settings['MAX_STATS_PER_WEEK']:
                 yield Request(self.base_url.format(self.settings['YAHOO_LEAGUEID'], current_week + 1), callback=self.parse_stats)
             else:
