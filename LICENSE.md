@@ -1,16 +1,6 @@
-First, install the required packages from the requirements.txt file: pip install -r requirements.txt
+The MIT License
 
-Then, set your Yahoo username, password, and league id in the scrapeffl settings file.
-
-After that, just run scrapy crawl yahooffl -o stats.csv -t csv from the scrapeffl directory and it will generate a stats.csv file containing the projected player stats for the entire 17 week season.
-
---------------------
-
-Notes: Depending on your league scoring settings the scraper won't work as expected since the set of columns displayed on the page will not always be right. In that case, you should be able to update the code in yahooffl_spider.py to get the right columns by writing your own XPath expressions.
-
---------------------
-
-Copyright 2013 Dan Goldin (dangoldin on GitHub)
+Copyright 2014 Dan Goldin (dangoldin on GitHub)
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
