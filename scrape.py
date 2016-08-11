@@ -65,15 +65,17 @@ def process_page(driver, week, cnt):
     return stats
 
 def login(driver):
-    driver.get("http://football.fantasysports.yahoo.com/f1/966997")
+    driver.get("http://football.fantasysports.yahoo.com/f1/{0}".format(settings.YAHOO_LEAGUEID))
 
-    username = driver.find_element_by_name('login')
-    password = driver.find_element_by_name('passwd')
-
+    username = driver.find_element_by_name('username')
     username.send_keys(settings.YAHOO_USERNAME)
-    password.send_keys(settings.YAHOO_PASSWORD)
+    driver.find_element_by_id("login-signin").click()
 
-    driver.find_element_by_id(".save").click()
+    time.sleep(SLEEP_SECONDS)
+
+    password = driver.find_element_by_name('passwd')
+    password.send_keys(settings.YAHOO_PASSWORD)
+    driver.find_element_by_id("login-signin").click()
 
 def write_stats(stats, out):
     print 'Writing to file', out
