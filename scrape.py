@@ -7,10 +7,10 @@ import settings
 
 RE_REMOVE_HTML = re.compile('<.+?>')
 
-SLEEP_SECONDS = 5
-END_WEEK = 1
-PAGES_PER_WEEK = 2
-YAHOO_RESULTS_PER_PAGE = 25
+SLEEP_SECONDS = 3
+END_WEEK = 17
+PAGES_PER_WEEK = 4
+YAHOO_RESULTS_PER_PAGE = 25 # Static but used to calculate offsets for loading new pages
 
 fields = ['week','name','position', 'opp', 'passing_yds', 'passing_tds', 'passing_int',
     'rushing_att', 'rushing_yds', 'rushing_tds', 'receiving_tgt', 'receiving_rec', 'receiving_yds', 'receiving_tds',
