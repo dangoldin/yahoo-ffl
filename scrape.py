@@ -19,21 +19,25 @@ fields = ['week','name','position', 'opp', 'passing_yds', 'passing_tds', 'passin
 XPATH_MAP = {
     'name': 'td[contains(@class,"player")]/div/div/div[contains(@class,"ysf-player-name")]/a',
     'position': 'td[contains(@class,"player")]/div/div/div[contains(@class,"ysf-player-name")]/span',
-    'opp': 'td//div[contains(@class,"ysf-player-detail")]/span',
-    'passing_yds': 'td[16]',
-    'passing_tds': 'td[17]',
-    'passing_int': 'td[18]',
+    'opp': 'td//div[contains(@class,"ysf-player-detail")]/span/a[2]',
+
+    'passing_yds': 'td[10]',
+    'passing_tds': 'td[11]',
+    'passing_int': 'td[12]',
+
     'rushing_att': 'td[13]',
     'rushing_yds': 'td[14]',
     'rushing_tds': 'td[15]',
-    'receiving_tgt': 'td[9]',
-    'receiving_rec': 'td[10]',
-    'receiving_yds': 'td[11]',
-    'receiving_tds': 'td[12]',
-    'return_tds': 'td[19]',
-    'twopt': 'td[20]',
-    'fumbles': 'td[21]',
-    'points': 'td[5]',
+
+    'receiving_tgt': 'td[16]',
+    'receiving_rec': 'td[17]',
+    'receiving_yds': 'td[18]',
+    'receiving_tds': 'td[19]',
+
+    'return_tds': 'td[20]',
+    'twopt': 'td[21]',
+    'fumbles': 'td[22]',
+    'points': 'td[6]',
 }
 
 stats = []
