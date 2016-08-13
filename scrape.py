@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
-import time, re, csv
+import time, re, csv, sys
 
 import settings
 
@@ -83,13 +83,13 @@ def login(driver):
 
 def write_stats(stats, out):
     print 'Writing to file', out
-    with open('stats.csv','w') as f:
+    with open(out, 'w') as f:
         w = csv.DictWriter(f, delimiter=',', fieldnames=fields)
         w.writeheader()
         for row in stats:
             w.writerow(row)
 
-def get_stats():
+def get_stats(outfile):
     driver = webdriver.Chrome()
     driver.set_page_load_timeout(30)
 
@@ -103,10 +103,14 @@ def get_stats():
             page_stats = process_page(driver, week, cnt)
             stats.extend(page_stats)
 
-    write_stats(stats, 'stats.csv')
+    write_stats(stats, outfile)
 
     driver.close()
 
 if __name__ == '__main__':
-    get_stats()
+    outfile = 'stats.csv'
+    if len(sys.argv) > 1:
+        outfile = sys.argv[1]
+
+    get_stats(outfile)
 
