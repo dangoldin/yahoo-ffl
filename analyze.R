@@ -7,8 +7,6 @@ library(ggthemes)
 df <- read.csv("stats-2017.csv")
 summary(df)
 
-substr(df$position, 1, 3)
-
 getPosition <- function(s) {
   s <- as.character(s)
   substr(s, nchar(s)-1, nchar(s))
@@ -23,18 +21,40 @@ getTeam <- function(s) {
 df$position_only = sapply(df$position, getPosition)
 df$team = sapply(df$position, getTeam)
 
-ggplot(df, aes(x=position_only, y=points)) +
+# By position
+p <- ggplot(df, aes(x=position_only, y=points, color=position_only)) +
   stat_summary(fun.y="mean", geom="point") +
-  theme_few()
+  xlab("Position") + ylab("Avg Points") + ggtitle("Avg Points by Position") +
+  theme_few() + theme(legend.title = element_blank())
+ggsave("image/position-avg-points.png", plot=p, width=11, height=6.8)
 
-ggplot(df, aes(x=points)) +
+p <- ggplot(df, aes(x=points, color=position_only)) +
   geom_density(aes(group=position_only)) +
-  theme_few()
+  xlab("Points") + ylab("Density") + ggtitle("Points Density by Position") +
+  theme_few() + theme(legend.title = element_blank())
+ggsave("image/position-points-density.png", plot=p, width=11, height=6.8)
 
-ggplot(df, aes(x=team, y=points)) +
+p <- ggplot(df, aes(factor(position_only), points)) +
+  geom_boxplot() +
+  xlab("Position") + ylab("Points") + ggtitle("Points by Position") +
+  theme_few() + theme(legend.title = element_blank())
+ggsave("image/position-points-boxplot.png", plot=p, width=11, height=6.8)
+
+# By team
+p <- ggplot(df, aes(x=team, y=points, color=team)) +
   stat_summary(fun.y="mean", geom="point") +
-  theme_few()
+  xlab("Team") + ylab("Avg Points") + ggtitle("Avg Points by Team") +
+  theme_few() + theme(legend.title = element_blank())
+ggsave("image/team-avg-points.png", plot=p, width=11, height=6.8)
 
-ggplot(df, aes(x=points)) +
+p <- ggplot(df, aes(x=points, color=team)) +
   geom_density(aes(group=team)) +
-  theme_few()
+  xlab("Points") + ylab("Density") + ggtitle("Points Density by Team") +
+  theme_few() + theme(legend.title = element_blank())
+ggsave("image/team-points-density.png", plot=p, width=11, height=6.8)
+
+p <- ggplot(df, aes(factor(team), points)) +
+  geom_boxplot() +
+  xlab("Team") + ylab("Points") + ggtitle("Points by Team") +
+  theme_few() + theme(legend.title = element_blank())
+ggsave("image/team-points-boxplot.png", plot=p, width=11, height=6.8)
