@@ -9,11 +9,32 @@ summary(df)
 
 substr(df$position, 1, 3)
 
-lastTwoChars <- function(s) {
+getPosition <- function(s) {
   s <- as.character(s)
   substr(s, nchar(s)-1, nchar(s))
 }
 
-df$position_only = sapply(df$position, lastTwoChars)
+getTeam <- function(s) {
+  s <- as.character(s)
+  dash_loc = regexpr(" -", s, fixed=T)[1]
+  substr(s, 1, dash_loc - 1)
+}
 
-ggplot(df, aes(x=position_only, y=points)) + stat_summary(fun.y="mean", geom="point")
+df$position_only = sapply(df$position, getPosition)
+df$team = sapply(df$position, getTeam)
+
+ggplot(df, aes(x=position_only, y=points)) +
+  stat_summary(fun.y="mean", geom="point") +
+  theme_few()
+
+ggplot(df, aes(x=points)) +
+  geom_density(aes(group=position_only)) +
+  theme_few()
+
+ggplot(df, aes(x=team, y=points)) +
+  stat_summary(fun.y="mean", geom="point") +
+  theme_few()
+
+ggplot(df, aes(x=points)) +
+  geom_density(aes(group=team)) +
+  theme_few()
