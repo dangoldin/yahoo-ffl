@@ -45,7 +45,7 @@ p <- ggplot(df, aes(x=team, y=points, color=team)) +
   stat_summary(fun.y="mean", geom="point") +
   xlab("Team") + ylab("Avg Points") + ggtitle("Avg Points by Team") +
   theme_few() + theme(legend.title = element_blank())
-ggsave("image/team-avg-points.png", plot=p, width=11, height=6.8)
+ggsave("image/team-avg-points.png", plot=p, width=13, height=6.8)
 
 p <- ggplot(df, aes(x=points, color=team)) +
   geom_density(aes(group=team)) +
