@@ -19,7 +19,7 @@ fields = ['week','name','position', 'opp', 'passing_yds', 'passing_tds', 'passin
 XPATH_MAP = {
     'name': 'td[contains(@class,"player")]/div/div/div[contains(@class,"ysf-player-name")]/a',
     'position': 'td[contains(@class,"player")]/div/div/div[contains(@class,"ysf-player-name")]/span',
-    'opp': 'td//div[contains(@class,"ysf-player-detail")]/span/a[2]',
+    'opp': 'td//div[contains(@class,"ysf-player-detail")]/span/a',
 
     'passing_yds': 'td[10]',
     'passing_tds': 'td[11]',
@@ -77,7 +77,7 @@ def login(driver):
 
     time.sleep(SLEEP_SECONDS)
 
-    password = driver.find_element_by_name('passwd')
+    password = driver.find_element_by_name('password')
     password.send_keys(settings.YAHOO_PASSWORD)
     driver.find_element_by_id("login-signin").click()
 
