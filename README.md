@@ -14,4 +14,4 @@ To get it working:
 
 Notes: Depending on your league scoring settings the scraper might not work as expected since the set of columns displayed on the page vary due to differences in league settings. In that case, you should be able to update the code in scrape.py to come up with a new set of xpath expressions.
 
-For those that are lazy, you can download the stats.csv file which contains the data pulled for the latest season using my league's PPR settings.
+For those that are lazy, you can download the appropriate stats-###YEAR###.csv file which contains the data pulled using my league's PPR settings.
