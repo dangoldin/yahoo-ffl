@@ -4,7 +4,7 @@ install.packages("ggthemes")
 library(ggplot2)
 library(ggthemes)
 
-df <- read.csv("stats-2017.csv")
+df <- read.csv("stats-2018.csv")
 summary(df)
 
 getPosition <- function(s) {
