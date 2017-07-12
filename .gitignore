@@ -3,3 +3,4 @@ settings.py
 venv
 *.*~
 .DS_Store
+.Rhistory
