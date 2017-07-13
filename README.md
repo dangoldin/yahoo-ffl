@@ -1,7 +1,7 @@
 README
 ======
 
-Yahoo-ffl is a quick script to help download fantasy football stats from Yahoo. It's currently configured to do it using the Selenium webdriver and to retrieve the projected stats for the 2017 season. It should be straightforward to tweak the script to pull data for other league formats and settings. Pull requests to make it more flexible are welcome.
+Yahoo-ffl is a quick script to help download fantasy football stats from Yahoo. It's currently configured to do it using the Selenium webdriver and to retrieve the projected stats for the current (2017-2018) season. It should be straightforward to tweak the script to pull data for other league formats and settings. Pull requests to make it more flexible are welcome.
 
 To get it working:
 
