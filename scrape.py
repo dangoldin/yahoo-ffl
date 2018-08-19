@@ -7,7 +7,7 @@ import settings
 
 RE_REMOVE_HTML = re.compile('<.+?>')
 
-SLEEP_SECONDS = 2
+SLEEP_SECONDS = 3
 END_WEEK = 17
 PAGES_PER_WEEK = 5
 YAHOO_RESULTS_PER_PAGE = 25 # Static but used to calculate offsets for loading new pages
@@ -111,7 +111,12 @@ def get_stats(outfile):
     stats = []
     for week in range(1, END_WEEK + 1):
         for cnt in range(0, PAGES_PER_WEEK*YAHOO_RESULTS_PER_PAGE, YAHOO_RESULTS_PER_PAGE):
-            page_stats = process_page(driver, week, cnt)
+            try:
+                page_stats = process_page(driver, week, cnt)
+            except Exception as e:
+                print('Failed to process page, sleeping and retrying', e)
+                time.sleep(SLEEP_SECONDS * 5)
+                page_stats = process_page(driver, week, cnt)
             stats.extend(page_stats)
 
     write_stats(stats, outfile)
