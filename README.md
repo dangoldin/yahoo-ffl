@@ -6,6 +6,7 @@ Yahoo-ffl is a quick script to help download fantasy football stats from Yahoo. 
 To get it working:
 
 - Install the selenium library (pip install -r requirements.txt)
+- Download the latest [ChromeDriver](http://chromedriver.chromium.org/downloads)
 - Create a settings.py file containg your Yahoo username, password, and league id
 - Run the script using "python scrape.py"
 - To test the script you can modify some of the constants (END_WEEK, PAGES_PER_WEEK) in order to make sure the data is correct.
