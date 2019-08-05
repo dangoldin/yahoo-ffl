@@ -1,15 +1,16 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 
-import time, re, csv, sys
+import time, re, csv, sys, random
 
 import settings
 
 RE_REMOVE_HTML = re.compile('<.+?>')
 
-SLEEP_SECONDS = 3
+SLEEP_SECONDS = 2
 END_WEEK = 17
-PAGES_PER_WEEK = 5
+PAGES_PER_WEEK = 4
 YAHOO_RESULTS_PER_PAGE = 25 # Static but used to calculate offsets for loading new pages
 
 # Modify these as necessary based on league settings
@@ -17,7 +18,7 @@ fields = ['week', 'name', 'position', 'team', 'opp', 'bye_week',
     'passing_yds', 'passing_tds', 'passing_int',
     'rushing_att', 'rushing_yds', 'rushing_tds',
     'receiving_tgt', 'receiving_rec', 'receiving_yds', 'receiving_tds',
-    'return_tds', 'twopt', 'fumbles', 'points' ]
+    'return_tds', 'twopt', 'fumbles', 'points', 'pct_owned']
 
 # TODO: Try to get these automatically
 XPATH_MAP = {
@@ -25,24 +26,26 @@ XPATH_MAP = {
     'position': 'td[contains(@class,"player")]/div/div/div[contains(@class,"ysf-player-name")]/span',
     'opp': 'td//div[contains(@class,"ysf-player-detail")]/span/a',
 
-    'passing_yds': 'td[12]',
-    'passing_tds': 'td[13]',
-    'passing_int': 'td[14]',
+    'passing_yds': 'td[11]',
+    'passing_tds': 'td[12]',
+    'passing_int': 'td[13]',
 
-    'rushing_att': 'td[15]',
-    'rushing_yds': 'td[16]',
-    'rushing_tds': 'td[17]',
+    'rushing_att': 'td[14]',
+    'rushing_yds': 'td[15]',
+    'rushing_tds': 'td[16]',
 
-    'receiving_tgt': 'td[18]',
-    'receiving_rec': 'td[19]',
-    'receiving_yds': 'td[20]',
-    'receiving_tds': 'td[21]',
+    'receiving_tgt': 'td[17]',
+    'receiving_rec': 'td[18]',
+    'receiving_yds': 'td[19]',
+    'receiving_tds': 'td[20]',
 
-    'return_tds': 'td[22]',
-    'twopt': 'td[23]',
-    'fumbles': 'td[24]',
-    'points': 'td[8]',
-    'bye_week': 'td[7]',
+    'return_tds': 'td[21]',
+    'twopt': 'td[22]',
+    'fumbles': 'td[23]',
+    
+    'bye_week': 'td[6]',
+    'points': 'td[7]',
+    'pct_owned': 'td[8]',    
 }
 
 stats = []
@@ -74,8 +77,10 @@ def process_page(driver, week, cnt):
         stats_item = process_stats_row(row, week)
         stats.append(stats_item)
 
+    driver.find_element_by_tag_name('body').send_keys(Keys.END)
+
     print('Sleeping for', SLEEP_SECONDS)
-    time.sleep(SLEEP_SECONDS)
+    time.sleep(random.randint(SLEEP_SECONDS, SLEEP_SECONDS * 2))
     return stats
 
 def login(driver):
@@ -83,24 +88,27 @@ def login(driver):
 
     username = driver.find_element_by_name('username')
     username.send_keys(settings.YAHOO_USERNAME)
-    driver.find_element_by_id("login-signin").click()
+    driver.find_element_by_id("login-signin").send_keys(Keys.RETURN)
 
     time.sleep(SLEEP_SECONDS)
 
     password = driver.find_element_by_name('password')
     password.send_keys(settings.YAHOO_PASSWORD)
-    driver.find_element_by_id("login-signin").click()
+    driver.find_element_by_id("login-signin").send_keys(Keys.RETURN)
 
 def write_stats(stats, out):
     print('Writing to file', out)
     with open(out, 'w') as f:
         w = csv.DictWriter(f, delimiter=',', fieldnames=fields)
         w.writeheader()
-        for row in stats:
-            w.writerow(row)
+        w.writerows(stats)
 
 def get_stats(outfile):
-    driver = webdriver.Chrome()
+    chrome_options = Options()
+    chrome_options.add_extension('chrome-ublock.crx')
+    chrome_options.add_argument("--enable-extensions")
+
+    driver = webdriver.Chrome(chrome_options=chrome_options)
     driver.set_page_load_timeout(30)
 
     print("Logging in")
