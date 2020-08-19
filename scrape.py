@@ -18,7 +18,7 @@ fields = ['week', 'name', 'position', 'team', 'opp', 'bye_week',
     'passing_yds', 'passing_tds', 'passing_int',
     'rushing_att', 'rushing_yds', 'rushing_tds',
     'receiving_tgt', 'receiving_rec', 'receiving_yds', 'receiving_tds',
-    'return_tds', 'twopt', 'fumbles', 'points', 'pct_owned']
+    'return_tds', 'twopt', 'fumbles', 'points', 'pct_rostered', 'projected']
 
 # TODO: Try to get these automatically
 XPATH_MAP = {
@@ -26,26 +26,27 @@ XPATH_MAP = {
     'position': 'td[contains(@class,"player")]/div/div/div[contains(@class,"ysf-player-name")]/span',
     'opp': 'td//div[contains(@class,"ysf-player-detail")]/span/a',
 
-    'passing_yds': 'td[11]',
-    'passing_tds': 'td[12]',
-    'passing_int': 'td[13]',
+    'passing_yds': 'td[12]',
+    'passing_tds': 'td[13]',
+    'passing_int': 'td[14]',
 
-    'rushing_att': 'td[14]',
-    'rushing_yds': 'td[15]',
-    'rushing_tds': 'td[16]',
+    'rushing_att': 'td[15]',
+    'rushing_yds': 'td[16]',
+    'rushing_tds': 'td[17]',
 
-    'receiving_tgt': 'td[17]',
-    'receiving_rec': 'td[18]',
-    'receiving_yds': 'td[19]',
-    'receiving_tds': 'td[20]',
+    'receiving_tgt': 'td[18]',
+    'receiving_rec': 'td[19]',
+    'receiving_yds': 'td[20]',
+    'receiving_tds': 'td[21]',
 
-    'return_tds': 'td[21]',
-    'twopt': 'td[22]',
-    'fumbles': 'td[23]',
+    'return_tds': 'td[22]',
+    'twopt': 'td[23]',
+    'fumbles': 'td[24]',
     
-    'bye_week': 'td[6]',
-    'points': 'td[7]',
-    'pct_owned': 'td[8]',    
+    'bye_week': 'td[7]',
+    'points': 'td[8]',
+    'pct_rostered': 'td[9]',
+    'projected': 'td[10]',
 }
 
 stats = []
