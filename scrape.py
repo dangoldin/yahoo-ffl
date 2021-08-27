@@ -18,7 +18,7 @@ fields = ['week', 'name', 'position', 'team', 'opp', 'bye_week',
     'passing_yds', 'passing_tds', 'passing_int',
     'rushing_att', 'rushing_yds', 'rushing_tds',
     'receiving_tgt', 'receiving_rec', 'receiving_yds', 'receiving_tds',
-    'return_tds', 'twopt', 'fumbles', 'points', 'pct_rostered', 'projected']
+    'return_tds', 'twopt', 'fumbles', 'points', 'o_rank', 'projected', 'pct_rostered']
 
 # TODO: Try to get these automatically
 XPATH_MAP = {
@@ -42,11 +42,12 @@ XPATH_MAP = {
     'return_tds': 'td[22]',
     'twopt': 'td[23]',
     'fumbles': 'td[24]',
-    
+
     'bye_week': 'td[7]',
     'points': 'td[8]',
-    'pct_rostered': 'td[9]',
+    'o_rank': 'td[9]',
     'projected': 'td[10]',
+    'pct_rostered': 'td[11]',
 }
 
 stats = []
