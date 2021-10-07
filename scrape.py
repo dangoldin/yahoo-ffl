@@ -54,8 +54,6 @@ XPATH_MAP = {
     'pct_rostered': 'td[11]',
 }
 
-stats = []
-
 def process_stats_row(stat_row, week):
     stats_item = {}
     stats_item['week'] = week
@@ -138,8 +136,8 @@ def get_stats(outfile):
     driver.close()
 
 if __name__ == '__main__':
-    outfile = 'stats.csv'
+    outfile_name = 'stats.csv'
     if len(sys.argv) > 1:
-        outfile = sys.argv[1]
+        outfile_name = sys.argv[1]
 
-    get_stats(outfile)
+    get_stats(outfile_name)
