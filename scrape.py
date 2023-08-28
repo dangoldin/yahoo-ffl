@@ -12,7 +12,8 @@ import settings
 
 RE_REMOVE_HTML = re.compile("<.+?>")
 
-SLEEP_SECONDS = 2
+SLEEP_SECONDS = 3
+START_WEEK = 1
 END_WEEK = 17
 PAGES_PER_WEEK = 4
 YAHOO_RESULTS_PER_PAGE = (
@@ -48,22 +49,22 @@ fields = [
 
 # TODO: Try to get these automatically
 XPATH_MAP = {
-    "name": 'td[contains(@class,"player")]/div/div/div[contains(@class,"ysf-player-name")]/a',
-    "position": 'td[contains(@class,"player")]/div/div/div[contains(@class,"ysf-player-name")]/span',
-    "opp": 'td//div[contains(@class,"ysf-player-detail")]/span/a',
-    "passing_yds": "td[12]",
-    "passing_tds": "td[13]",
-    "passing_int": "td[14]",
-    "rushing_att": "td[15]",
-    "rushing_yds": "td[16]",
-    "rushing_tds": "td[17]",
-    "receiving_tgt": "td[18]",
-    "receiving_rec": "td[19]",
-    "receiving_yds": "td[20]",
-    "receiving_tds": "td[21]",
-    "return_tds": "td[22]",
-    "twopt": "td[23]",
-    "fumbles": "td[24]",
+    "name": 'td//div[contains(@class,"ysf-player-name")]/a',
+    "position": 'td//div[contains(@class,"ysf-player-name")]/span',
+    "opp": 'td//div[contains(@class,"ysf-player-detail")]/span',
+    "passing_yds": "td[14]",
+    "passing_tds": "td[15]",
+    "passing_int": "td[16]",
+    "rushing_att": "td[19]",
+    "rushing_yds": "td[20]",
+    "rushing_tds": "td[21]",
+    "receiving_rec": "td[22]",
+    "receiving_yds": "td[23]",
+    "receiving_tds": "td[24]",
+    "receiving_tgt": "td[25]",
+    "return_tds": "td[27]",
+    "twopt": "td[28]",
+    "fumbles": "td[29]",
     "bye_week": "td[7]",
     "points": "td[8]",
     "o_rank": "td[9]",
@@ -77,7 +78,8 @@ def process_stats_row(stat_row, week):
     stats_item["week"] = week
     for col_name, xpath in XPATH_MAP.items():
         stats_item[col_name] = RE_REMOVE_HTML.sub(
-            "", stat_row.find_element_by_xpath(xpath).get_attribute("innerHTML")
+            "", stat_row.find_element_by_xpath(
+                xpath).get_attribute("innerHTML")
         )
     # Custom logic for team, position, and opponent
     stats_item["opp"] = stats_item["opp"].split(" ")[-1]
@@ -99,6 +101,7 @@ def process_page(driver, week, cnt):
     base_xpath = "//div[contains(concat(' ',normalize-space(@class),' '),' players ')]/table/tbody/tr"
 
     rows = driver.find_elements_by_xpath(base_xpath)
+    print(f"Fetched {len(rows)} rows")
 
     stats = []
     for row in rows:
@@ -148,21 +151,28 @@ def get_stats(outfile):
     time.sleep(SLEEP_SECONDS)
 
     stats = []
-    for week in range(1, END_WEEK + 1):
-        for cnt in range(
-            0, PAGES_PER_WEEK * YAHOO_RESULTS_PER_PAGE, YAHOO_RESULTS_PER_PAGE
-        ):
-            try:
-                page_stats = process_page(driver, week, cnt)
-            except Exception as e:
-                print("Failed to process page, sleeping and retrying", e)
-                time.sleep(SLEEP_SECONDS * 5)
-                page_stats = process_page(driver, week, cnt)
-            stats.extend(page_stats)
+    succeeded = True
+    try:
+        for week in range(START_WEEK, END_WEEK + 1):
+            for cnt in range(
+                0, PAGES_PER_WEEK * YAHOO_RESULTS_PER_PAGE, YAHOO_RESULTS_PER_PAGE
+            ):
+                try:
+                    page_stats = process_page(driver, week, cnt)
+                except Exception as e:
+                    print("Failed to process page, sleeping and retrying", e)
+                    time.sleep(SLEEP_SECONDS * 5)
+                    page_stats = process_page(driver, week, cnt)
+                stats.extend(page_stats)
+    except Exception as e:
+        succeeded = False
+        print(
+            f"Failed to process week at week {week} and cnt {cnt}, giving up and writing stats", e)
 
     write_stats(stats, outfile)
 
-    driver.close()
+    if succeeded:
+        driver.close()
 
 
 if __name__ == "__main__":
